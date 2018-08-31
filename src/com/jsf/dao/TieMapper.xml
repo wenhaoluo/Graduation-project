@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsf.dao.TieMapper" >
+  <resultMap id="TieResultMap" type="com.jsf.entity.Tie" >
+    <id column="tieid" property="tieid" jdbcType="INTEGER" />
+    <result column="tietitle" property="tietitle" jdbcType="VARCHAR" />
+    <result column="tieauthor" property="tieauthor" jdbcType="VARCHAR" />
+    <result column="tiecontext" property="tiecontext" jdbcType="VARCHAR" />
+    <result column="tieDate" property="tiedate"  />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+  </resultMap>
+  <insert id="insert" parameterType="Tie">
+		insert into tie
+		(tieid,tietitle,tieauthor,tiecontext,tiedate,userid)
+		values 
+	(#{tieid},#{tietitle},#{tieauthor},#{tiecontext},#{tiedate},#{userid});
+	</insert>
+	  
+
+	<!-- 前台数据查看帖子 -->
+	<select id="selecttie" resultMap="TieResultMap" >
+    select * from tie GROUP BY tieDate DESC
+  </select>
+  
+  	<!-- 前台数据查看我发过的帖子 -->
+	<select id="selectmytie" parameterType="Tie" resultMap="TieResultMap" >
+    SELECT * FROM tie WHERE userid=#{userid} GROUP BY tieDate DESC
+  </select>
+  <!-- 通过关键字分页查询, 返回数据集 -->
+  <select id="selectPageList" parameterType="page" resultMap="TieResultMap" >
+    select * from tie where tietitle like #{keyWord} limit #{start},#{rows}
+  </select>
+  <!-- 通过关键字分页查询，返回总记录数 -->
+  <select id="selectPageCount" parameterType="page" resultType="Integer">
+  	select count(1) from tie where tietitle like #{keyWord} 
+  </select>
+  
+  <!-- 通过多条件分页查询，返回数据集 -->
+  <select id="selectPageListUseDyc" parameterType="page" resultMap="TieResultMap" >
+    select * from tie 
+    <where>
+    	<if test="paramEntity.tietitle!=null">and tietitle like #{paramEntity.tietitle}</if>
+    	<if test="paramEntity.tiecontext!=null">and tiecontext like #{paramEntity.tiecontext}</if>    
+    </where>
+	 limit #{start},#{rows}
+  </select>
+  
+  <!-- 通过多条件分页查询，返回总记录数 -->
+  <select id="selectPageCountUseDyc" parameterType="page" resultType="Integer">
+  	select count(1) from tie 
+  	<where>
+    	<if test="paramEntity.tietitle!=null">and tietitle like #{paramEntity.tietitle}</if>
+    	<if test="paramEntity.tiecontext!=null">and tiecontext like #{paramEntity.tiecontext}</if>     
+    </where>
+  </select>
+  <!-- 通过主键批量删除 -->
+  <delete id="deleteList">
+  	delete from tie where tieid in
+	<foreach collection="array" open="(" close=")" separator="," item="pk">
+		#{pk}
+	</foreach>
+	  </delete>
+</mapper>

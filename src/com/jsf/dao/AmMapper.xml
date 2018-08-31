@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsf.dao.AmMapper" >
+  <resultMap id="AmResultMap" type="com.jsf.entity.Am" >
+    <id column="amid" property="amid" jdbcType="INTEGER" />
+    <result column="amusername" property="amusername" jdbcType="VARCHAR" />
+    <result column="ampassword" property="ampassword" jdbcType="VARCHAR" />
+  </resultMap>
+   <select id="login" parameterType="Am" resultMap="AmResultMap">
+<!-- 这里自己改为具体字段 -->
+  	select * from am where amusername =#{amusername} and ampassword=#{ampassword}
+  </select>
+</mapper>

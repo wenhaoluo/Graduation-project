@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+encoding//WebRoot/WEB-INF/user/insert.jsp=UTF-8
+encoding//WebRoot/WEB-INF/user/select.jsp=UTF-8
+encoding//src/com/jsf/dao/UserMapper.xml=UTF-8
+encoding/<project>=UTF-8

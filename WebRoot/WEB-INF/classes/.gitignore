@@ -1,0 +1,8 @@
+/META-INF/
+/applicationContext.xml
+/com/
+/generatorConfig.xml
+/log4j.properties
+/myBatis-config.xml
+/scm/
+/spring-mvc.xml

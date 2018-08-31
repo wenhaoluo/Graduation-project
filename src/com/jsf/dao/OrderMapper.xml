@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsf.dao.OrderMapper" >
+  <resultMap id="orderResultMap" type="com.jsf.entity.Order" >
+    <id column="orderid" property="orderid" jdbcType="INTEGER" />
+    <result column="ordertime" property="ordertime"  />
+    <result column="orderprice" property="orderprice" jdbcType="INTEGER" />
+    <result column="empid" property="empid" jdbcType="INTEGER" />
+    <result column="userid" property="userid"  />
+  </resultMap>
+  <insert id="insert" parameterType="Order">
+		insert into `order`
+		(orderid,ordertime,orderprice,empid,userid)
+		values 
+		(#{orderid},#{ordertime},#{orderprice},#{empid},#{userid});
+	</insert>
+	  
+     <!-- 通过多条件分页查询，返回数据集 -->
+  <select id="selectPageListUseDyc" parameterType="page" resultMap="orderResultMap" >
+    <![CDATA[ select * from `order` 
+   
+	where ordertime >#{starttime} and ordertime <=#{endtime}
+
+    limit #{start},#{rows}
+     ]]>
+  </select>
+  <!-- 通过多条件分页查询，返回总记录数 -->
+  <select id="selectPageCountUseDyc" parameterType="page" resultType="Integer">
+  	select count(1) from `order` 
+
+  </select>
+  
+  <update id="insertvip" parameterType="Order" >
+		update order set
+		orderid=#{orderid},ordertime=#{ordertime},orderprice=#{orderprice},userid=#{userid}
+		where
+		orderid=#{orderid}	
+	</update>
+	<update id="updatevip" parameterType="Order" >
+		update order set
+		orderid=#{orderid},ordertime=#{ordertime},orderprice=#{orderprice},userid=#{userid}
+		where
+		orderid=#{orderid}	
+	</update>
+  <!-- 通过主键批量删除供应商 -->
+  <delete id="deleteList">
+  	delete from order where orderid in
+	<foreach collection="array" open="(" close=")" separator="," item="pk">
+		#{pk}
+	</foreach>
+	  </delete>
+
+	  
+</mapper>

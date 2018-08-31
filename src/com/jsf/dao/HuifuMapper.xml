@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsf.dao.HuifuMapper" >
+  <resultMap id="huifuResultMap" type="com.jsf.entity.Huifu" >
+    <id column="hfid" property="hfid" jdbcType="INTEGER" />
+    <result column="hfauthor" property="hfauthor" jdbcType="VARCHAR" />
+    <result column="hfcontext" property="hfcontext" jdbcType="VARCHAR" />
+    <result column="hfDate" property="hfdate" />
+    <result column="tieid" property="tieid" jdbcType="INTEGER" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+  </resultMap>
+   <insert id="insert" parameterType="User">
+		insert into huifu
+		(hfid,hfauthor,hfcontext,hfdate,tieid,userid)
+		values 
+		(#{hfid},#{hfauthor},#{hfcontext},#{hfdate},#{tieid},#{userid});
+	</insert>
+	  
+	<!-- 根据主键修改供应商信息 -->
+	<update id="update" parameterType="User" >
+		update huifu set
+		hfid=#{hfid},hfauthor=#{hfauthor},hfcontext=#{hfcontext},hfdate=#{hfdate},userid=#{userid}
+		where
+		hfid=#{hfid}	
+	</update>
+ <!-- 通过关键字分页查询, 返回数据集 -->
+  <select id="selectPageList" parameterType="page" resultMap="huifuResultMap" >
+    select * from huifu where tietitle like #{keyWord} limit #{start},#{rows}
+  </select>
+  <!-- 通过关键字分页查询，返回总记录数 -->
+  <select id="selectPageCount" parameterType="page" resultType="Integer">
+  	select count(1) from huifu where tietitle like #{keyWord} 
+  </select>
+  <!-- 前台数据查看回复 -->
+	<select id="selecthuifu" resultMap="huifuResultMap" >
+    select * from huifu GROUP BY hfDate DESC
+  </select>
+  <!-- 通过多条件分页查询，返回数据集 -->
+  <select id="selectPageListUseDyc" parameterType="page" resultMap="huifuResultMap" >
+    select * from huifu 
+    <where>
+    	<if test="paramEntity.tietitle!=null">and tietitle like #{paramEntity.tietitle}</if>
+    	<if test="paramEntity.tiecontext!=null">and tiecontext like #{paramEntity.tiecontext}</if>    
+    </where>
+	 limit #{start},#{rows}
+  </select>
+  
+  <!-- 通过多条件分页查询，返回总记录数 -->
+  <select id="selectPageCountUseDyc" parameterType="page" resultType="Integer">
+  	select count(1) from huifu 
+  	<where>
+    	<if test="paramEntity.tietitle!=null">and tietitle like #{paramEntity.tietitle}</if>
+    	<if test="paramEntity.tiecontext!=null">and tiecontext like #{paramEntity.tiecontext}</if>     
+    </where>
+  </select>
+  <!-- 通过主键批量删除供应商 -->
+  <delete id="deleteList">
+  	delete from huifu where hfid in
+	<foreach collection="array" open="(" close=")" separator="," item="pk">
+		#{pk}
+	</foreach>
+	  </delete>
+</mapper>

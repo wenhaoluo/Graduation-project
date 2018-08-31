@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jsf.dao.UserMapper">
+  <resultMap id="userResultMap" type="com.jsf.entity.User">
+    <id column="userid" jdbcType="INTEGER" property="userid" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="role" jdbcType="VARCHAR" property="role" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="truename" jdbcType="VARCHAR" property="truename" />
+    <result column="Birth"  property="birth" />
+    <result column="Phone" jdbcType="VARCHAR" property="phone" />
+    <result column="vipendtime"  property="vipendtime" />
+    <result column="number"  property="number" />
+    <result column="status"  property="status" />
+  </resultMap>
+   <select id="login" parameterType="User" resultMap="userResultMap">
+<!-- 这里自己改为具体字段 -->
+  	select * from user where username =#{username} and password=#{password} and role=#{role}
+  </select>
+  
+  <select id="select1" resultMap="userResultMap">
+<!-- 这里自己改为具体字段 -->
+  	select * from user
+  </select>
+  
+  <insert id="insert" parameterType="User">
+		insert into user
+		(userid,username,password,role,sex,truename,birth,phone,vipendtime)
+		values 
+	(#{userid},#{username},#{password},#{role},#{sex},#{truename},#{birth},#{phone},#{vipendtime});
+	</insert>
+	  
+	<!-- 根据主键修改用户信息 -->
+	<update id="update" parameterType="User" >
+		update user set
+		userid=#{userid},username=#{username},password=#{password},role=#{role},sex=#{sex},
+		truename=#{truename},birth=#{birth},phone=#{phone}
+		where
+		userid=#{userid}	
+	</update>
+	
+	 <!-- 通过关键字分页查询, 返回数据集 -->
+  <select id="selectPageList" parameterType="page" resultMap="userResultMap" >
+    select * from user where role like #{keyWord} limit #{start},#{rows}
+  </select>
+  <!-- 通过关键字分页查询，返回总记录数 -->
+  <select id="selectPageCount" parameterType="page" resultType="Integer">
+  	select count(1) from user where role like #{keyWord} 
+  </select>
+  
+     <!-- 通过多条件分页查询，返回数据集 -->
+  <select id="selectPageListUseDyc" parameterType="page" resultMap="userResultMap" >
+    select * from user 
+    <where>
+    	<if test="paramEntity.username!=null">and username like #{paramEntity.username}</if>
+    	<if test="paramEntity.role!=null">and role like #{paramEntity.role}</if>    
+    </where>
+	 limit #{start},#{rows}
+  </select>
+  <!-- 通过多条件分页查询，返回总记录数 -->
+  <select id="selectPageCountUseDyc" parameterType="page" resultType="Integer">
+  	select count(1) from user 
+  	  <where>
+    	<if test="paramEntity.username!=null">and username like #{paramEntity.username}</if>
+    	<if test="paramEntity.role!=null">and role like #{paramEntity.role}</if>    
+    </where>
+  </select>
+  <select id="selectuser" parameterType="java.lang.Integer" resultType="User">
+  	select * from user
+  	where
+  	userid=#{id} 
+
+  </select>
+	<!-- 根据用户当前时间修改会员到期时间 -->
+	<update id="updatevip" parameterType="User" >
+		update user set
+		vipendtime =( SELECT
+		date(
+		DATE_SUB(vipendtime, INTERVAL - #{number} MONTH)
+		) )
+		where
+		userid=#{userid}	
+	</update>
+	
+		<!-- 根据根据系统当前时间修改会员到期时间 -->
+	<update id="insertvip" parameterType="User" >
+		update user set
+		vipendtime =( SELECT
+		date(
+		DATE_SUB(CURDATE(), INTERVAL - #{number} MONTH)
+		) )
+		where
+		userid=#{userid}	
+	</update>
+  
+  <!-- 通过主键批量删除用户 -->
+  <delete id="deleteList">
+  	delete from user where userid in
+	<foreach collection="array" open="(" close=")" separator="," item="pk">
+		#{pk}
+	</foreach>
+	  </delete>
+</mapper>

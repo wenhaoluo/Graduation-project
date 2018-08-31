@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jsf.dao.CourseMapper" >
+  <resultMap id="courseResultMap" type="com.jsf.entity.Course" >
+    <id column="courseid" property="courseid" jdbcType="INTEGER" />
+    <result column="yytime" property="yytime" />
+    <result column="classover" property="classover" jdbcType="BIT" />
+    <result column="teacherid" property="teacherid" jdbcType="INTEGER" />
+    <result column="studentid" property="studentid" jdbcType="INTEGER" />
+    <result column="cid" property="cid" jdbcType="INTEGER" />
+    <result column="phone" property="phone" />
+  </resultMap>
+   <insert id="insert" parameterType="Course">
+		insert into course
+		(courseid,yytime,classover,teacherid,studentid,cid)
+		values 
+		(#{courseid},#{yytime},#{classover},#{teacherid},#{studentid},#{cid});
+	</insert>
+	
+	  
+	<!-- 根据主键修改课程信息 -->
+	<update id="update" parameterType="Course" >
+		update course set
+		courseid=#{courseid},yytime=#{yytime},classover=#{classover},teacherid=#{teacherid},
+		studentid=#{studentid},cid=#{cid}
+		where
+		courseid=#{courseid}	
+	</update>
+	
+	 <!-- 通过多条件分页查询，返回数据集 教师-我的课程 -->
+  <select id="selectPageListteacher" parameterType="page" resultMap="courseResultMap" >
+    select * from (select u.phone,c.courseid,c.yytime,j.cid,j.cname,j.ctext,u.truename from course c,jsclass j,user u WHERE
+     c.cid=j.cid AND c.studentid=u.userid AND teacherid=#{userid}) AS teacher
+
+	 limit #{start},#{rows}
+  </select>
+
+  <!-- 通过多条件分页查询，返回总记录数  教师-我的课程-->
+  <select id="selectPageCountteacher" parameterType="page" resultType="Integer">
+  	select count(1) from (select u.phone,c.courseid,c.yytime,j.cid,j.cname,j.ctext,u.truename from course c,jsclass j,user u WHERE
+     c.cid=j.cid AND c.studentid=u.userid AND teacherid=#{userid}) AS teacher
+
+  </select>
+
+  
+     <!-- 通过多条件分页查询，返回数据集  学生-我的课程 -->
+  <select id="selectPageListUseDyc" parameterType="page" resultMap="courseResultMap" >
+    select * from (select u.phone,c.courseid,c.yytime,j.cid,j.cname,j.ctext,u.truename from course c,jsclass j,user u WHERE
+     c.cid=j.cid AND c.teacherid=u.userid AND studentid=#{userid}) AS student
+    <where>
+    	<if test="paramEntity.cname!=null">and cname like #{paramEntity.cname}</if>
+    </where>
+	 limit #{start},#{rows}
+  </select>
+
+  <!-- 通过多条件分页查询，返回总记录数 学生-我的课程-->
+  <select id="selectPageCountUseDyc" parameterType="page" resultType="Integer">
+  	select count(1) from (select u.phone,c.courseid,c.yytime,j.cid,j.cname,j.ctext,u.truename from course c,jsclass j,user u WHERE
+     c.cid=j.cid AND c.teacherid=u.userid AND studentid=#{userid}) AS student
+  	  <where>
+    	<if test="paramEntity.cname!=null">and cname like #{paramEntity.cname}</if>
+    </where>
+  </select>
+
+  
+  <!-- 通过主键批量删除供应商 -->
+  <delete id="deleteList">
+  	delete from course where courseid in
+	<foreach collection="array" open="(" close=")" separator="," item="pk">
+		#{pk}
+	</foreach>
+	  </delete>
+</mapper>
